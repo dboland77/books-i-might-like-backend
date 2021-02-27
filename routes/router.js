@@ -78,7 +78,15 @@ router.post("/login", (req, res, next) => {
 });
 
 router.get("/main", isLoggedIn, (req, res, next) => {
-  res.send("Authorised ok");
+  db.query(`SELECT * FROM assessment2;`, (err, result) => {
+    if (err) {
+      throw err;
+      return res.status(400).send({
+        msg: err,
+      });
+    }
+    res.status(200).send(result);
+  });
 });
 
 router.post("/sign-up", validateRegister, (req, res, next) => {
