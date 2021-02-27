@@ -1,4 +1,12 @@
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: __dirname + "/../.env" });
 
 const validateRegister = (req, res, next) => {
   // username min length 3
@@ -28,4 +36,18 @@ const validateRegister = (req, res, next) => {
   next();
 };
 
-export default validateRegister;
+const isLoggedIn = (req, res, next) => {
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.JWT_ENCRYPTION);
+    req.userData = decoded;
+    next();
+  } catch (err) {
+    console.log(err);
+    return res.status(401).send({
+      msg: "Your session is not valid!",
+    });
+  }
+};
+
+export { validateRegister, isLoggedIn };

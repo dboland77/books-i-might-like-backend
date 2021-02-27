@@ -1,14 +1,14 @@
 import mysql from "mysql";
 import dotenv from "dotenv";
 import path from "path";
-import {fileURLToPath} from 'url';
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-dotenv.config({path: __dirname + '/../.env'});
+dotenv.config({ path: __dirname + "/../.env" });
 
-console.log(process.env['DB_HOST']);
+//console.log(process.env['DB_HOST']);
 
 const connection = mysql.createConnection({
   host: process.env.DB_HOST,

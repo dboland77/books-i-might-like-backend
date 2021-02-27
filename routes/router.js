@@ -3,7 +3,16 @@ import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
 import jwt from "jsonwebtoken";
 import db from "../config/db.js";
-import validateRegister from "../middleware/users.js";
+import { validateRegister, isLoggedIn } from "../middleware/users.js";
+
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: __dirname + "/../.env" });
 
 const router = express.Router();
 
@@ -11,7 +20,7 @@ router.post("/login", (req, res, next) => {
   db.query(
     `SELECT * FROM users WHERE username = ${db.escape(req.body.username)};`,
     (err, result) => {
-      // user does not exists
+      // user does not exist
       if (err) {
         throw err;
         return res.status(400).send({
@@ -44,9 +53,9 @@ router.post("/login", (req, res, next) => {
                 username: result[0].username,
                 userId: result[0].userid,
               },
-              "SECRETKEY",
+              process.env.JWT_ENCRYPTION,
               {
-                expiresIn: "7d",
+                expiresIn: process.env.JWT_EXPIRATION,
               }
             );
 
@@ -68,8 +77,8 @@ router.post("/login", (req, res, next) => {
   );
 });
 
-router.get("/main", (req, res, next) => {
-  res.send("logged in");
+router.get("/main", isLoggedIn, (req, res, next) => {
+  res.send("Authorised ok");
 });
 
 router.post("/sign-up", validateRegister, (req, res, next) => {
