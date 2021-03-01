@@ -17,7 +17,11 @@ dotenv.config({ path: __dirname + "/../.env" });
 const router = express.Router();
 
 router.get("/", (req, res) => {
-  res.status(200).send("Main page please login to see your books");
+  res
+    .status(200)
+    .send(
+      `This is publicly available content on the main page. Please login to see your books.`
+    );
 });
 
 router.post("/login", (req, res, next) => {
@@ -81,16 +85,20 @@ router.post("/login", (req, res, next) => {
   );
 });
 
+// Pull random sample to represent different users
 router.get("/main", isLoggedIn, (req, res, next) => {
-  db.query(`SELECT * FROM assessment2 ORDER BY RAND() LIMIT 20;`, (err, result) => {
-    if (err) {
-      throw err;
-      return res.status(400).send({
-        msg: err,
-      });
+  db.query(
+    `SELECT * FROM assessment2 ORDER BY RAND() LIMIT 20;`,
+    (err, result) => {
+      if (err) {
+        throw err;
+        return res.status(400).send({
+          msg: err,
+        });
+      }
+      res.status(200).send(result);
     }
-    res.status(200).send(result);
-  });
+  );
 });
 
 router.post("/sign-up", validateRegister, (req, res, next) => {
